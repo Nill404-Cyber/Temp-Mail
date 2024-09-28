@@ -1,4 +1,4 @@
-#Temp Mail Generator
+# Temp Mail Generator
 
 This project is a simple web application that generates temporary email addresses using the [1secmail API](https://www.1secmail.com/api/) and displays incoming messages associated with the generated email. Users can generate a new email, copy it to the clipboard, and automatically refresh the mailbox for incoming messages.
 
