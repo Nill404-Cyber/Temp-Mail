@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2FA Key & Temp Mail Generator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #2a2a2a;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+        }
+        .box {
+            text-align: center;
+        }
+        .button-container {
+            margin: 20px 0;
+        }
+        button {
+            width: 10em;
+            height: 3.5em;
+            position: relative;
+            border: 3px ridge #3e8e41; 
+            outline: none;
+            background-color: #1a1a1a; 
+            color: #fff; 
+            transition: 0.3s ease; 
+            border-radius: 0.3em;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button::after, button::before {
+            content: "";
+            position: absolute;
+            background-color: #1a1a1a;
+            transition: 0.5s;
+            transform-origin: center;
+        }
+
+        button::before {
+            top: 80%; 
+        }
+
+        button:hover::before, button:hover::after {
+            transform: scale(0);
+        }
+
+        button:hover {
+            box-shadow: inset 0px 0px 25px #00a2ca; 
+            background-color: rgba(62, 142, 65, 0.2); 
+        }
+        button:focus {
+            outline: 3px solid #000000; 
+        }
+
+        .mailbox {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            border: 1px solid #333;
+            border-radius: 8px;
+            background-color: #2a2a2a;
+            margin-bottom: 20px;
+        }
+        .mailbox-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #333;
+        }
+        .mailbox-header h2 {
+            margin: 0;
+            color: #fff;
+        }
+        .mailbox-body {
+            padding: 20px;
+        }
+        .mailbox-body ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .mailbox-body li {
+            padding: 10px;
+            border-bottom: 1px solid #333;
+        }
+        .mailbox-body li:last-child {
+            border-bottom: none;
+        }
+        .mailbox-body a {
+            text-decoration: none;
+            color: #3e8e41;
+        }
+        .mailbox-body a:hover {
+            color: #fff;
+        }
+
+        @media only screen and (max-width: 600px) {
+            .container {
+                width: 90%;
+                margin: 20px auto;
+            }
+            .mailbox {
+                width: 90%;
+                margin: 20px auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="mail-generator">
+        <div class="box">
+            <h2 style="color: #fff;">Temp Mail By Nill-XD</h2>
+            <div class="button-container">
+                <button class="btn generate-btn" onclick="generateMail()">Generate Email</button>
+                <button class="btn copy-btn" onclick="copyEmail()">Copy Email</button>
+            </div>
+            <p><strong style="color: #fff;">Email:</strong> <span id="email" style="color: #fff;">None </span></p>
+            <div class="mailbox">
+                <div class="mailbox-header">
+                <div class="mailbox-body">
+                    <ul id="messages"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let refreshInterval;
+
+        function generateMail() {
+            const randomNumber = Math.floor(Math.random() * 1000); 
+            const randomNumber2 = Math.floor(Math.random() * 1000); 
+            const randomNumber3 = Math.floor(Math.random() * 100); 
+            const mailName = `niloy${randomNumber}.${randomNumber3}.${randomNumber2}`;
+            const email = `${mailName}@1secmail.com`;
+            document.getElementById('email').innerText = email;
+            refreshMail(mailName);
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+            refreshInterval = setInterval(() => refreshMail(mailName), 1000);
+        }
+        function copyEmail() {
+            const emailText = document.getElementById('email').innerText;
+            navigator.clipboard.writeText(emailText).then(() => {
+                alert('Email copied to clipboard');
+            });
+        }
+        function refreshMail(mailName) {
+            const url = `https://www.1secmail.com/api/v1/?action=getMessages&login=${mailName}&domain=1secmail.com`;
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    const messagesDiv = document.getElementById('messages');
+                    messagesDiv.innerHTML = "";  
+                    if (data.length === 0) {
+                        messagesDiv.innerHTML = "<li>No new messages.</li>";
+                    } else {
+                        data.forEach(message => {
+                            const messageElement = document.createElement('li');
+                            messageElement.innerHTML = `<a href="#">From: ${message.from}, Subject: ${message.subject}</a>`;
+                            messagesDiv.appendChild(messageElement);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    const messagesDiv = document.getElementById('messages');
+                    messagesDiv.innerHTML = "<li>Failed to fetch messages.</li>";
+                });
+        }
+    </script>
+</body>
+</html>
